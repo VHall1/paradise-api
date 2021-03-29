@@ -5,18 +5,21 @@ export class User {
   @PrimaryGeneratedColumn('uuid')
   id: number;
 
-  @Column()
+  @Column({ unique: true })
   steam: string;
 
-  @Column()
+  @Column({ unique: true })
   discord: string;
 
-  @Column()
+  @Column({ default: false })
+  admin: boolean;
+
+  @Column({ default: false })
   whitelisted: boolean;
 
-  @Column()
+  @Column({ default: false })
   banned: boolean;
 
-  @Column()
+  @Column({ default: 1 })
   priority: number;
 }
