@@ -17,16 +17,12 @@ export default {
     }
 
     try {
-      await getConnection()
-        .createQueryBuilder()
-        .insert()
-        .into(User)
-        .values({
-          steam,
-          discord,
-        })
-        .returning('*')
-        .execute();
+      const newUser = new User();
+
+      newUser.steam = steam;
+      newUser.discord = discord;
+
+      newUser.save();
     } catch (err) {
       console.error(err);
       return res.status(500).json({ error: err });
