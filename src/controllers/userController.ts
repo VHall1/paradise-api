@@ -1,5 +1,4 @@
 import { Request, Response } from 'express';
-import { getConnection } from 'typeorm';
 import { User } from '../entities/User';
 
 export default {
