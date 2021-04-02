@@ -14,5 +14,6 @@ routes.get('/whitelist/status', whitelistController.isWhitelisted);
 
 // Character
 routes.post('/character/create', characterController.create);
+routes.get('/character/list', characterController.list);
 
 export { routes };

@@ -1,8 +1,32 @@
 import { Request, Response } from 'express';
+import { User } from '../entities/User';
 import { Character } from '../entities/Character';
 import * as yup from 'yup';
 
 export default {
+  async list(req: Request, res: Response) {
+    const { steam } = req.body;
+
+    const schema = yup.object().shape({
+      steam: yup.string().required(),
+    });
+
+    try {
+      schema.validate({ steam });
+    } catch (error) {
+      return res.status(400).json({ error });
+    }
+
+    let characters;
+    try {
+      characters = await User.findOneOrFail(steam, { select: ['characters'] });
+    } catch (error) {
+      return res.status(400).json({ error });
+    }
+
+    return res.status(200).json({ characters });
+  },
+
   async create(req: Request, res: Response) {
     const { steam, name, surename, birthdate, phone } = req.body;
 
@@ -15,29 +39,39 @@ export default {
     });
 
     try {
-      await schema.isValid({ steam, name, surename, birthdate, phone });
+      await schema.isValid({
+        steam,
+        name,
+        surename,
+        birthdate,
+        phone,
+      });
     } catch (error) {
       return res.status(400).json({ error });
     }
 
-    // const user = await User.find({ steam });
+    let user;
+    try {
+      user = await User.findOneOrFail(steam);
+    } catch (error) {
+      return res.status(400).json({ error });
+    }
 
-    // if (user?.length) {
-    //   return res.status(400).json({ error: 'err/already_exists' });
-    // }
+    let character;
+    try {
+      character = new Character();
 
-    // try {
-    //   const newUser = new User();
+      character.user = user;
+      character.name = name;
+      character.surename = surename;
+      character.birthdate = birthdate;
+      character.phone = phone;
 
-    //   newUser.steam = steam;
-    //   newUser.discord = discord;
+      await character.save();
+    } catch (error) {
+      return res.status(400).json({ error });
+    }
 
-    //   newUser.save();
-    // } catch (err) {
-    //   console.error(err);
-    //   return res.status(500).json({ error: err });
-    // }
-
-    return res.status(200).send();
+    return res.status(200).json({ character });
   },
 };
