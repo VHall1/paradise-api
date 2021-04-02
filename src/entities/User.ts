@@ -1,8 +1,15 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  BaseEntity,
+  Column,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Character } from './Character';
 
 @Entity()
-export class User {
-  @PrimaryGeneratedColumn('uuid')
+export class User extends BaseEntity {
+  @PrimaryGeneratedColumn()
   id: number;
 
   @Column({ unique: true })
@@ -22,4 +29,7 @@ export class User {
 
   @Column({ default: 1 })
   priority: number;
+
+  @OneToMany(() => Character, (character) => character.user)
+  characters: Character[];
 }
