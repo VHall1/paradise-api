@@ -1,8 +1,13 @@
-import userController from './controllers/userController';
 import { Router } from 'express';
+import userController from './controllers/userController';
+import whitelistController from './controllers/whitelistController';
 
 const routes = Router();
 
-routes.post('/create_user', userController.create);
+// User
+routes.post('/user/create', userController.create);
+
+// Whitelist
+routes.post('/whitelist/add', whitelistController.add);
 
 export { routes };
