@@ -24,7 +24,9 @@ export default {
       return res.status(400).json({ error });
     }
 
-    const characters = user.characters.filter((character) => character.deleted);
+    const characters = user.characters.filter(
+      (character) => !character.deleted
+    );
 
     return res.status(200).json({ characters });
   },
@@ -77,51 +79,36 @@ export default {
     return res.status(200).json({ character });
   },
 
-  // async delete(req: Request, res: Response) {
-  //   const { steam, id } = req.body;
+  async delete(req: Request, res: Response) {
+    const { steam, id } = req.body;
 
-  //   const schema = yup.object().shape({
-  //     steam: yup.string().required(),
-  //     name: yup.string().required(),
-  //     surename: yup.string().required(),
-  //     birthdate: yup.string().required(),
-  //     phone: yup.string().required(),
-  //   });
+    const schema = yup.object().shape({
+      steam: yup.string().required(),
+      id: yup.number().required(),
+    });
 
-  //   try {
-  //     await schema.validate({
-  //       steam,
-  //       name,
-  //       surename,
-  //       birthdate,
-  //       phone,
-  //     });
-  //   } catch (error) {
-  //     return res.status(400).json({ error });
-  //   }
+    try {
+      await schema.validate({
+        steam,
+        id,
+      });
+    } catch (error) {
+      return res.status(400).json({ error });
+    }
 
-  //   let user;
-  //   try {
-  //     user = await User.findOneOrFail(steam);
-  //   } catch (error) {
-  //     return res.status(400).json({ error });
-  //   }
+    let character;
+    try {
+      character = await Character.findOneOrFail(id, {
+        where: { user: steam },
+      });
 
-  //   let character;
-  //   try {
-  //     character = new Character();
+      character.deleted = true;
 
-  //     character.user = user;
-  //     character.name = name;
-  //     character.surename = surename;
-  //     character.birthdate = birthdate;
-  //     character.phone = phone;
+      await character.save();
+    } catch (error) {
+      return res.status(400).json({ error });
+    }
 
-  //     await character.save();
-  //   } catch (error) {
-  //     return res.status(400).json({ error });
-  //   }
-
-  //   return res.status(200).json({ character });
-  // },
+    return res.status(200).json({ character });
+  },
 };
