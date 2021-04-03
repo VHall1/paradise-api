@@ -39,7 +39,7 @@ export default {
     });
 
     try {
-      await schema.isValid({
+      await schema.validate({
         steam,
         name,
         surename,

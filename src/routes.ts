@@ -1,16 +1,16 @@
 import { Router } from 'express';
 import characterController from './controllers/characterController';
 import userController from './controllers/userController';
-import whitelistController from './controllers/whitelistController';
 
 const routes = Router();
 
 // User
+routes.get('/user/get', userController.get);
 routes.post('/user/create', userController.create);
-
+// Banned
+routes.post('/user/banned/set', userController.updateBanned);
 // Whitelist
-routes.post('/whitelist/add', whitelistController.add);
-routes.get('/whitelist/status', whitelistController.isWhitelisted);
+routes.post('/user/whitelisted/set', userController.updateWhitelisted);
 
 // Character
 routes.post('/character/create', characterController.create);
