@@ -32,14 +32,13 @@ export default {
   },
 
   async create(req: Request, res: Response) {
-    const { steam, name, surename, birthdate, phone } = req.body;
+    const { steam, name, surename, birthdate } = req.body;
 
     const schema = yup.object().shape({
       steam: yup.string().required(),
       name: yup.string().required(),
       surename: yup.string().required(),
       birthdate: yup.string().required(),
-      phone: yup.string().required(),
     });
 
     try {
@@ -48,7 +47,6 @@ export default {
         name,
         surename,
         birthdate,
-        phone,
       });
     } catch (error) {
       return res.status(400).json({ error });
@@ -59,6 +57,14 @@ export default {
       user = await User.findOneOrFail(steam);
     } catch (error) {
       return res.status(400).json({ error });
+    }
+
+    const generatePhoneNumber = () =>
+      `${213}${Math.floor(Math.random() * 9000000) + 1000000}`;
+
+    let phone = generatePhoneNumber();
+    while (!Character.find({ where: { phone } })) {
+      phone = generatePhoneNumber();
     }
 
     let character;
