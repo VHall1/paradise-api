@@ -6,32 +6,34 @@ export default {
   async create(req: Request, res: Response) {
     const { steam, discord } = req.body;
 
-    if (!steam || !discord) {
-      return res.status(400).json({ error: 'err/empty_field' });
-    }
-
-    const user = await User.find({ steam });
-
-    if (user?.length) {
-      return res.status(400).json({ error: 'err/already_exists' });
-    }
+    const schema = yup.object().shape({
+      steam: yup.string().required(),
+      discord: yup.string().required(),
+    });
 
     try {
-      const newUser = new User();
+      await schema.validate({ steam, discord });
+    } catch (error) {
+      return res.status(400).json({ error });
+    }
+
+    let newUser: User;
+    try {
+      newUser = new User();
 
       newUser.steam = steam;
       newUser.discord = discord;
 
-      newUser.save();
+      await newUser.save();
     } catch (error) {
       console.error(error);
       return res.status(500).json({ error });
     }
 
-    return res.status(200).send();
+    return res.status(200).json({ newUser });
   },
 
-  async get(req: Request, res: Response) {
+  async read(req: Request, res: Response) {
     const { steam } = req.body;
 
     const schema = yup.object().shape({
@@ -45,11 +47,13 @@ export default {
     }
 
     let user: User;
-
     try {
-      user = await User.findOneOrFail(steam);
-    } catch {
-      return res.status(400).json({ error: 'User not found' });
+      user = await User.findOneOrFail({ steam });
+    } catch (error) {
+      if (error.name === 'EntityNotFound')
+        return res.status(404).json({ error });
+
+      return res.status(500).json({ error });
     }
 
     return res.status(200).json({ user });
