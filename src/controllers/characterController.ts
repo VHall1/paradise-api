@@ -4,33 +4,6 @@ import { Character } from '../entities/Character';
 import * as yup from 'yup';
 
 export default {
-  async list(req: Request, res: Response) {
-    const { steam } = req.body;
-
-    const schema = yup.object().shape({
-      steam: yup.string().required(),
-    });
-
-    try {
-      schema.validate({ steam });
-    } catch (error) {
-      return res.status(400).json({ error });
-    }
-
-    let user;
-    try {
-      user = await User.findOneOrFail(steam, { relations: ['characters'] });
-    } catch (error) {
-      return res.status(400).json({ error });
-    }
-
-    const characters = user.characters.filter(
-      (character) => !character.deleted
-    );
-
-    return res.status(200).json({ characters });
-  },
-
   async create(req: Request, res: Response) {
     const { steam, name, surename, birthdate } = req.body;
 
@@ -54,20 +27,20 @@ export default {
 
     let user;
     try {
-      user = await User.findOneOrFail(steam);
+      user = await User.findOneOrFail({ steam });
     } catch (error) {
+      if (error.name === 'EntityNotFound')
+        return res.status(404).json({ error });
+
       return res.status(400).json({ error });
     }
 
-    const generatePhoneNumber = () =>
-      `${213}${Math.floor(Math.random() * 9000000) + 1000000}`;
+    let phone;
+    do {
+      phone = (Math.floor(Math.random() * 9000000) + 1000000).toString();
+    } while (!Character.find({ phone }));
 
-    let phone = generatePhoneNumber();
-    while (!Character.find({ where: { phone } })) {
-      phone = generatePhoneNumber();
-    }
-
-    let character;
+    let character: Character;
     try {
       character = new Character();
 
@@ -83,6 +56,36 @@ export default {
     }
 
     return res.status(200).json({ character });
+  },
+
+  async list(req: Request, res: Response) {
+    const { steam } = req.body;
+
+    const schema = yup.object().shape({
+      steam: yup.string().required(),
+    });
+
+    try {
+      await schema.validate({ steam });
+    } catch (error) {
+      return res.status(400).json({ error });
+    }
+
+    let user;
+    try {
+      user = await User.findOneOrFail({ steam }, { relations: ['characters'] });
+    } catch (error) {
+      if (error.name === 'EntityNotFound')
+        return res.status(404).json({ error });
+
+      return res.status(400).json({ error });
+    }
+
+    const characters = user.characters.filter(
+      (character) => !character.deleted
+    );
+
+    return res.status(200).json({ characters });
   },
 
   async delete(req: Request, res: Response) {
@@ -105,13 +108,16 @@ export default {
     let character;
     try {
       character = await Character.findOneOrFail(id, {
-        where: { user: steam },
+        where: { user: { steam } },
       });
 
       character.deleted = true;
 
       await character.save();
     } catch (error) {
+      if (error.name === 'EntityNotFound')
+        return res.status(404).json({ error });
+
       return res.status(400).json({ error });
     }
 

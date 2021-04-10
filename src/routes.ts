@@ -11,7 +11,7 @@ routes.post('/user/update', userController.update);
 
 // Character
 routes.post('/character/create', characterController.create);
-routes.post('/character/delete', characterController.delete);
 routes.get('/character/list', characterController.list);
+routes.post('/character/delete', characterController.delete);
 
 export { routes };
