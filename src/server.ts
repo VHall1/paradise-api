@@ -1,24 +1,21 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import { routes } from './routes';
 import 'reflect-metadata';
 import { createConnection } from 'typeorm';
-import { ApolloServer } from 'apollo-server-express';
 
 // Load ENV variables
 dotenv.config();
 
 const main = async () => {
+  const connection = await createConnection();
+
   const app = express();
 
-  // TypeORM
-  await createConnection();
-
   app.use(cors());
-
-  const apolloServer = new ApolloServer({});
-
-  apolloServer.applyMiddleware({ app });
+  app.use(express.json());
+  app.use(routes);
 
   if (!process.env.PORT) throw new Error('No PORT set in .env');
 
