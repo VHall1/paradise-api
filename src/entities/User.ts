@@ -1,9 +1,23 @@
-import { BaseEntity, Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
+import {
+  BaseEntity,
+  Column,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Character } from './Character';
+
+enum UserLocales {
+  ENGLISH = 'en',
+  PORTUGUESE = 'pt',
+}
 
 @Entity()
 export class User extends BaseEntity {
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column({ unique: true })
   steam: string;
 
   @Column({ unique: true })
@@ -20,6 +34,9 @@ export class User extends BaseEntity {
 
   @Column({ default: 1 })
   priority: number;
+
+  @Column({ type: 'enum', enum: UserLocales, default: UserLocales.PORTUGUESE })
+  locale: UserLocales;
 
   @OneToMany(() => Character, (character) => character.user)
   characters: Character[];

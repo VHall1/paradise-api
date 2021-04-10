@@ -2,9 +2,12 @@ import {
   BaseEntity,
   Column,
   Entity,
+  OneToOne,
   ManyToOne,
   PrimaryGeneratedColumn,
+  JoinColumn,
 } from 'typeorm';
+import { CharacterSurvival } from './CharacterSurvival';
 import { User } from './User';
 
 @Entity()
@@ -29,4 +32,8 @@ export class Character extends BaseEntity {
 
   @ManyToOne(() => User, (user) => user.characters)
   user: User;
+
+  @JoinColumn()
+  @OneToOne(() => CharacterSurvival)
+  characterSurvival: CharacterSurvival;
 }
