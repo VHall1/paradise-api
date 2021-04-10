@@ -6,32 +6,33 @@ export default {
   async create(req: Request, res: Response) {
     const { steam, discord } = req.body;
 
-    if (!steam || !discord) {
-      return res.status(400).json({ error: 'err/empty_field' });
-    }
-
-    const user = await User.find({ steam });
-
-    if (user?.length) {
-      return res.status(400).json({ error: 'err/already_exists' });
-    }
+    const schema = yup.object().shape({
+      steam: yup.string().required(),
+      discord: yup.string().required(),
+    });
 
     try {
-      const newUser = new User();
+      await schema.validate({ steam, discord });
+    } catch (error) {
+      return res.status(400).json({ error });
+    }
+
+    let newUser: User;
+    try {
+      newUser = new User();
 
       newUser.steam = steam;
       newUser.discord = discord;
 
-      newUser.save();
+      await newUser.save();
     } catch (error) {
-      console.error(error);
       return res.status(500).json({ error });
     }
 
-    return res.status(200).send();
+    return res.status(200).json({ user: newUser });
   },
 
-  async get(req: Request, res: Response) {
+  async read(req: Request, res: Response) {
     const { steam } = req.body;
 
     const schema = yup.object().shape({
@@ -45,79 +46,75 @@ export default {
     }
 
     let user: User;
-
     try {
-      user = await User.findOneOrFail(steam);
-    } catch {
-      return res.status(400).json({ error: 'User not found' });
+      user = await User.findOneOrFail({ steam });
+    } catch (error) {
+      if (error.name === 'EntityNotFound')
+        return res.status(404).json({ error });
+
+      return res.status(400).json({ error });
     }
 
     return res.status(200).json({ user });
   },
 
-  async updateWhitelisted(req: Request, res: Response) {
-    const { steam, status } = req.body;
+  async update(req: Request, res: Response) {
+    const { steam, discord, admin, whitelisted, banned, priority } = req.body;
 
     const schema = yup.object().shape({
       steam: yup.string().required(),
-      status: yup.boolean().required(),
+      discord: yup.string(),
+      admin: yup.boolean(),
+      whitelisted: yup.boolean(),
+      banned: yup.boolean(),
+      priority: yup.number().integer().min(1).max(5),
     });
 
     try {
-      await schema.validate({ steam, status });
+      await schema.validate({
+        steam,
+        discord,
+        admin,
+        whitelisted,
+        banned,
+        priority,
+      });
     } catch (error) {
       return res.status(400).json({ error });
     }
 
     let user: User;
-
     try {
-      user = await User.findOneOrFail(steam);
-    } catch {
-      return res.status(400).json({ error: 'User not found' });
+      user = await User.findOneOrFail({ steam });
+    } catch (error) {
+      if (error.name === 'EntityNotFound')
+        return res.status(404).json({ error });
+
+      return res.status(400).json({ error });
     }
 
     try {
-      user.whitelisted = status;
+      const values = Object.entries({
+        discord,
+        admin,
+        whitelisted,
+        banned,
+        priority,
+      });
+
+      values.forEach(([key, value]) => {
+        if (value === undefined) return;
+
+        // @ts-ignore
+        user[key] = value;
+      });
+
       await user.save();
     } catch (error) {
       console.error(error);
       return res.status(500).json({ error });
     }
 
-    return res.status(200).json({ status });
-  },
-
-  async updateBanned(req: Request, res: Response) {
-    const { steam, status } = req.body;
-
-    const schema = yup.object().shape({
-      steam: yup.string().required(),
-      status: yup.boolean().required(),
-    });
-
-    try {
-      await schema.validate({ steam, status });
-    } catch (error) {
-      return res.status(400).json({ error });
-    }
-
-    let user: User;
-
-    try {
-      user = await User.findOneOrFail(steam);
-    } catch {
-      return res.status(400).json({ error: 'User not found' });
-    }
-
-    try {
-      user.banned = status;
-      await user.save();
-    } catch (err) {
-      console.error(err);
-      return res.status(500).json({ error: err });
-    }
-
-    return res.status(200).json({ status });
+    return res.status(200).json({ user });
   },
 };
