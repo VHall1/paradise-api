@@ -108,8 +108,15 @@ export default {
     let character;
     try {
       character = await Character.findOneOrFail(id, {
-        where: { user: { steam } },
+        relations: ['user'],
       });
+
+      if (character.user.steam !== steam) {
+        throw {
+          name: 'EntityNotFound',
+          message: `Could not find any entity of type \"User\" matching: {\n\"steam\": \"${steam}\"\n`,
+        };
+      }
 
       character.deleted = true;
 
