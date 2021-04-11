@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { CharacterSurvival } from './CharacterSurvival';
 import { User } from './User';
+import { Bank } from './Bank';
 
 @Entity()
 export class Character extends BaseEntity {
@@ -36,4 +37,8 @@ export class Character extends BaseEntity {
   @JoinColumn()
   @OneToOne(() => CharacterSurvival)
   characterSurvival: CharacterSurvival;
+
+  @JoinColumn()
+  @OneToOne(() => Bank)
+  bank: Bank;
 }
