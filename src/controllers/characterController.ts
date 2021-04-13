@@ -134,43 +134,29 @@ export default {
 
   async updateCoords(req: Request, res: Response) {
     const { id, lastCoords } = req.body;
-    let character: Character;
-    let characterSurvival: CharacterSurvival;
 
+    console.log(id, lastCoords);
     const schema = yup.object().shape({
       id: yup.number().required(),
+      lastCoords: yup.array().required(),
     });
 
-    try {
-      await schema.validate({ id });
-    } catch (error) {
-      return res.status(400).json({ error });
-    }
+    await schema.validate({ id, lastCoords });
 
-    try {
-      character = await Character.findOneOrFail(id, {
-        relations: ['character_survival'],
-      });
-    } catch (error) {
-      if (error.name === 'EntityNotFound')
-        return res.status(404).json({ error });
+    let character = await Character.findOneOrFail(id, {
+      relations: ['characterSurvival'],
+    });
 
-      return res.status(400).json({ error });
-    }
-
+    let characterSurvival: CharacterSurvival;
     if (!character.characterSurvival) {
       characterSurvival = new CharacterSurvival();
-      await characterSurvival.save();
 
       character.characterSurvival = characterSurvival;
     } else characterSurvival = character.characterSurvival;
 
-    try {
-      characterSurvival.lastCoords = lastCoords;
-      await characterSurvival.save();
-    } catch (error) {
-      return res.status(400).json({ error });
-    }
+    characterSurvival.lastCoords = lastCoords;
+    await characterSurvival.save();
+    await character.save();
 
     return res.status(200).send();
   },
