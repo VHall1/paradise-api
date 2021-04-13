@@ -6,10 +6,12 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
   JoinColumn,
+  OneToMany,
 } from 'typeorm';
 import { CharacterSurvival } from './CharacterSurvival';
 import { User } from './User';
 import { Bank } from './Bank';
+import { Vehicle } from './Vehicle';
 
 @Entity()
 export class Character extends BaseEntity {
@@ -33,6 +35,9 @@ export class Character extends BaseEntity {
 
   @ManyToOne(() => User, (user) => user.characters)
   user: User;
+
+  @OneToMany(() => Vehicle, (vehicle) => vehicle.owner)
+  vehicles: Vehicle;
 
   @JoinColumn()
   @OneToOne(() => CharacterSurvival)
