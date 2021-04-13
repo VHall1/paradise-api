@@ -15,6 +15,9 @@ routes.post('/character/create', characterController.create);
 routes.get('/character/list', characterController.list);
 routes.post('/character/delete', characterController.delete);
 
+// Character Survival
+routes.post('/character/save_coords', characterController.updateCoords);
+
 // Bank
 routes.get('/bank/read', bankController.read);
 routes.post('/bank/update', bankController.update);

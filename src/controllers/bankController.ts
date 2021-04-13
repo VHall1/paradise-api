@@ -67,7 +67,6 @@ export default {
     let characterBank: Bank;
     if (!character.bank) {
       characterBank = new Bank();
-      await bank.save();
 
       character.bank = characterBank;
       await character.save();
@@ -86,7 +85,7 @@ export default {
         characterBank[key] = value;
       });
 
-      characterBank.save();
+      await characterBank.save();
     } catch (error) {
       return res.status(500).json({ error });
     }

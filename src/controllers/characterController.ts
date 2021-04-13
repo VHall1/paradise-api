@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { User } from '../entities/User';
 import { Character } from '../entities/Character';
+import { CharacterSurvival } from '../entities/CharacterSurvival';
 import * as yup from 'yup';
 
 export default {
@@ -129,5 +130,48 @@ export default {
     }
 
     return res.status(200).json({ character });
+  },
+
+  async updateCoords(req: Request, res: Response) {
+    const { id, lastCoords } = req.body;
+    let character: Character;
+    let characterSurvival: CharacterSurvival;
+
+    const schema = yup.object().shape({
+      id: yup.number().required(),
+    });
+
+    try {
+      await schema.validate({ id });
+    } catch (error) {
+      return res.status(400).json({ error });
+    }
+
+    try {
+      character = await Character.findOneOrFail(id, {
+        relations: ['character_survival'],
+      });
+    } catch (error) {
+      if (error.name === 'EntityNotFound')
+        return res.status(404).json({ error });
+
+      return res.status(400).json({ error });
+    }
+
+    if (!character.characterSurvival) {
+      characterSurvival = new CharacterSurvival();
+      await characterSurvival.save();
+
+      character.characterSurvival = characterSurvival;
+    } else characterSurvival = character.characterSurvival;
+
+    try {
+      characterSurvival.lastCoords = lastCoords;
+      await characterSurvival.save();
+    } catch (error) {
+      return res.status(400).json({ error });
+    }
+
+    return res.status(200).send();
   },
 };
