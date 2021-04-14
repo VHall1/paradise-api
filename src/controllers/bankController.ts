@@ -14,37 +14,17 @@ export default {
 
     try {
       await schema.validate({ characterId });
-    } catch (error) {
-      return res.status(400).json({ error });
-    }
 
-    let character: Character;
-    try {
-      character = await Character.findOneOrFail(characterId);
+      const character = await Character.findOneOrFail(characterId);
+      const bank = await Bank.findOneOrFail({ character });
+
+      return res.status(200).json({ wallet: bank.wallet });
     } catch (error) {
       if (error.name === 'EntityNotFound')
         return res.status(404).json({ error });
 
       return res.status(400).json({ error });
     }
-
-    let wallet: number;
-    let bank = await Bank.findOne({ character });
-
-    if (!bank) {
-      try {
-        bank = new Bank();
-        bank.character = character;
-
-        await bank.save();
-      } catch (error) {
-        return res.status(400).json({ error });
-      }
-    }
-
-    wallet = bank.wallet;
-
-    return res.status(200).json({ wallet });
   },
 
   async getBank(req: Request, res: Response) {
@@ -57,87 +37,113 @@ export default {
 
     try {
       await schema.validate({ characterId });
-    } catch (error) {
-      return res.status(400).json({ error });
-    }
 
-    let character: Character;
-    try {
-      character = await Character.findOneOrFail(characterId);
+      const character = await Character.findOneOrFail(characterId);
+      const bank = await Bank.findOneOrFail({ character });
+
+      return res.status(200).json({ bank: bank.bank });
     } catch (error) {
       if (error.name === 'EntityNotFound')
         return res.status(404).json({ error });
 
       return res.status(400).json({ error });
     }
-
-    let bank = await Bank.findOne({ character });
-
-    if (!bank) {
-      try {
-        bank = new Bank();
-        bank.character = character;
-
-        await bank.save();
-      } catch (error) {
-        return res.status(400).json({ error });
-      }
-    }
-
-    return res.status(200).json({ bank: bank.bank });
   },
 
-  // async update(req: Request, res: Response) {
-  //   const { id, bank, wallet } = req.body;
+  async withdraw(req: Request, res: Response) {
+    const { id, value } = req.body;
+
+    const schema = yup.object().shape({
+      id: yup.number().required(),
+      value: yup.number().required(),
+    });
+
+    try {
+      await schema.validate({ id, value });
+
+      const character = await Character.findOneOrFail(id);
+      const bank = await Bank.findOneOrFail({ character });
+
+      if (bank.bank >= value) {
+        bank.bank - value;
+        bank.wallet + value;
+
+        await bank.save();
+      } else {
+        return res.status(400).json({ error: { name: 'InsufficientBalance' } });
+      }
+
+      return res.status(200).json({ bank: bank.bank, wallet: bank.wallet });
+    } catch (error) {
+      if (error.name === 'EntityNotFound')
+        return res.status(404).json({ error });
+
+      return res.status(400).json({ error });
+    }
+  },
+
+  async deposit(req: Request, res: Response) {
+    const { id, value } = req.body;
+
+    const schema = yup.object().shape({
+      id: yup.number().required(),
+      value: yup.number().required(),
+    });
+
+    try {
+      await schema.validate({ id, value });
+
+      const character = await Character.findOneOrFail(id);
+      const bank = await Bank.findOneOrFail({ character });
+
+      if (bank.bank >= value) {
+        bank.wallet - value;
+        bank.bank + value;
+
+        await bank.save();
+      } else {
+        return res.status(400).json({ error: { name: 'InsufficientBalance' } });
+      }
+
+      return res.status(200).json({ bank: bank.bank, wallet: bank.wallet });
+    } catch (error) {
+      if (error.name === 'EntityNotFound')
+        return res.status(404).json({ error });
+
+      return res.status(400).json({ error });
+    }
+  },
+
+  // async transfer(req: Request, res: Response) {
+  //   const { id, target, value } = req.body;
 
   //   const schema = yup.object().shape({
   //     id: yup.number().required(),
-  //     bank: yup.number(),
-  //     wallet: yup.number(),
+  //     target: yup.number().required(),
+  //     value: yup.number().required(),
   //   });
 
   //   try {
-  //     await schema.validate({ id, bank, wallet });
-  //   } catch (error) {
-  //     return res.status(400).json({ error });
-  //   }
+  //     await schema.validate({ id, target, value });
 
-  //   let character: Character;
-  //   try {
-  //     character = await Character.findOneOrFail(id, { relations: ['bank'] });
+  //     const character = await Character.findOneOrFail(id);
+  //     const bank = await Bank.findOneOrFail({ character });
+
+  //     if (bank.bank >= value) {
+  //       bank.wallet - value;
+  //       bank.bank + value;
+
+  //       await bank.save();
+  //     } else {
+  //       return res.status(400).json({ error: { name: 'InsufficientBalance' } });
+  //     }
+
+  //     return res.status(200).json({ bank: bank.bank });
   //   } catch (error) {
   //     if (error.name === 'EntityNotFound')
   //       return res.status(404).json({ error });
 
   //     return res.status(400).json({ error });
   //   }
-
-  //   let characterBank: Bank;
-  //   if (!character.bank) {
-  //     characterBank = new Bank();
-
-  //     character.bank = characterBank;
-  //     await character.save();
-  //   } else characterBank = character.bank;
-
-  //   try {
-  //     const values = Object.entries({
-  //       bank,
-  //       wallet,
-  //     });
-
-  //     values.forEach(([key, value]) => {
-  //       if (value === undefined) return;
-
-  //       // @ts-ignore
-  //       characterBank[key] = value;
-  //     });
-
-  //     await characterBank.save();
-  //   } catch (error) {
-  //     return res.status(500).json({ error });
-  //   }
-
-  //   return res.status(200).json({ bank: character.bank });
   // },
 };
