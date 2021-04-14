@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { User } from '../entities/User';
 import { Character } from '../entities/Character';
 import { CharacterSurvival } from '../entities/CharacterSurvival';
+import { CharacterCustom } from '../entities/CharacterCustom';
 import * as yup from 'yup';
 
 export default {
