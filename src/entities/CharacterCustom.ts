@@ -1,4 +1,12 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  BaseEntity,
+  Column,
+  Entity,
+  JoinColumn,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Character } from './Character';
 
 @Entity()
 export class CharacterCustom extends BaseEntity {
@@ -10,6 +18,10 @@ export class CharacterCustom extends BaseEntity {
 
   @Column({ type: 'jsonb' })
   custom: JSON;
+
+  @JoinColumn()
+  @OneToOne(() => Character)
+  character: Character;
 }
 
 // parents = parseInt(myClothes[1]),

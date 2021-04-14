@@ -1,4 +1,12 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  BaseEntity,
+  Column,
+  Entity,
+  JoinColumn,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Character } from './Character';
 
 @Entity()
 export class Bank extends BaseEntity {
@@ -10,4 +18,8 @@ export class Bank extends BaseEntity {
 
   @Column({ default: 4500 })
   bank: number;
+
+  @JoinColumn()
+  @OneToOne(() => Character)
+  character: Character;
 }
