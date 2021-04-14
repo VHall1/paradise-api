@@ -4,22 +4,23 @@ import { Character } from '../entities/Character';
 import * as yup from 'yup';
 
 export default {
-  async read(req: Request, res: Response) {
-    const { id } = req.body;
+  async getWallet(req: Request, res: Response) {
+    const { id } = req.params;
+    const characterId = parseInt(id);
 
     const schema = yup.object().shape({
-      id: yup.number().required(),
+      characterId: yup.number().required(),
     });
 
     try {
-      await schema.validate({ id });
+      await schema.validate({ characterId });
     } catch (error) {
       return res.status(400).json({ error });
     }
 
     let character: Character;
     try {
-      character = await Character.findOneOrFail(id, { relations: ['bank'] });
+      character = await Character.findOneOrFail(characterId);
     } catch (error) {
       if (error.name === 'EntityNotFound')
         return res.status(404).json({ error });
@@ -27,36 +28,42 @@ export default {
       return res.status(400).json({ error });
     }
 
-    let bank: Bank;
-    if (!character.bank) {
-      bank = new Bank();
-      await bank.save();
+    let wallet: number;
+    let bank = await Bank.findOne({ character });
 
-      character.bank = bank;
-      await character.save();
+    if (!bank) {
+      try {
+        bank = new Bank();
+        bank.character = character;
+
+        await bank.save();
+      } catch (error) {
+        return res.status(400).json({ error });
+      }
     }
 
-    return res.status(200).json({ bank: character.bank });
+    wallet = bank.wallet;
+
+    return res.status(200).json({ wallet });
   },
 
-  async update(req: Request, res: Response) {
-    const { id, bank, wallet } = req.body;
+  async getBank(req: Request, res: Response) {
+    const { id } = req.params;
+    const characterId = parseInt(id);
 
     const schema = yup.object().shape({
-      id: yup.number().required(),
-      bank: yup.number(),
-      wallet: yup.number(),
+      characterId: yup.number().required(),
     });
 
     try {
-      await schema.validate({ id, bank, wallet });
+      await schema.validate({ characterId });
     } catch (error) {
       return res.status(400).json({ error });
     }
 
     let character: Character;
     try {
-      character = await Character.findOneOrFail(id, { relations: ['bank'] });
+      character = await Character.findOneOrFail(characterId);
     } catch (error) {
       if (error.name === 'EntityNotFound')
         return res.status(404).json({ error });
@@ -64,32 +71,73 @@ export default {
       return res.status(400).json({ error });
     }
 
-    let characterBank: Bank;
-    if (!character.bank) {
-      characterBank = new Bank();
+    let bank = await Bank.findOne({ character });
 
-      character.bank = characterBank;
-      await character.save();
-    } else characterBank = character.bank;
+    if (!bank) {
+      try {
+        bank = new Bank();
+        bank.character = character;
 
-    try {
-      const values = Object.entries({
-        bank,
-        wallet,
-      });
-
-      values.forEach(([key, value]) => {
-        if (value === undefined) return;
-
-        // @ts-ignore
-        characterBank[key] = value;
-      });
-
-      await characterBank.save();
-    } catch (error) {
-      return res.status(500).json({ error });
+        await bank.save();
+      } catch (error) {
+        return res.status(400).json({ error });
+      }
     }
 
-    return res.status(200).json({ bank: character.bank });
+    return res.status(200).json({ bank: bank.bank });
   },
+
+  // async update(req: Request, res: Response) {
+  //   const { id, bank, wallet } = req.body;
+
+  //   const schema = yup.object().shape({
+  //     id: yup.number().required(),
+  //     bank: yup.number(),
+  //     wallet: yup.number(),
+  //   });
+
+  //   try {
+  //     await schema.validate({ id, bank, wallet });
+  //   } catch (error) {
+  //     return res.status(400).json({ error });
+  //   }
+
+  //   let character: Character;
+  //   try {
+  //     character = await Character.findOneOrFail(id, { relations: ['bank'] });
+  //   } catch (error) {
+  //     if (error.name === 'EntityNotFound')
+  //       return res.status(404).json({ error });
+
+  //     return res.status(400).json({ error });
+  //   }
+
+  //   let characterBank: Bank;
+  //   if (!character.bank) {
+  //     characterBank = new Bank();
+
+  //     character.bank = characterBank;
+  //     await character.save();
+  //   } else characterBank = character.bank;
+
+  //   try {
+  //     const values = Object.entries({
+  //       bank,
+  //       wallet,
+  //     });
+
+  //     values.forEach(([key, value]) => {
+  //       if (value === undefined) return;
+
+  //       // @ts-ignore
+  //       characterBank[key] = value;
+  //     });
+
+  //     await characterBank.save();
+  //   } catch (error) {
+  //     return res.status(500).json({ error });
+  //   }
+
+  //   return res.status(200).json({ bank: character.bank });
+  // },
 };

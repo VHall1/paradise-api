@@ -19,7 +19,7 @@ routes.post('/character/delete', characterController.delete);
 routes.post('/character/save_coords', characterController.updateCoords);
 
 // Bank
-routes.get('/bank/read', bankController.read);
-routes.post('/bank/update', bankController.update);
+routes.get('/bank/get_wallet/:id', bankController.getWallet);
+routes.get('/bank/get_bank/:id', bankController.getBank);
 
 export { routes };
