@@ -8,6 +8,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { CharacterSurvival } from './CharacterSurvival';
+import { CharacterCustom } from './CharacterCustom';
 import { User } from './User';
 import { Bank } from './Bank';
 
@@ -37,6 +38,10 @@ export class Character extends BaseEntity {
   @JoinColumn()
   @OneToOne(() => CharacterSurvival)
   characterSurvival: CharacterSurvival;
+
+  @JoinColumn()
+  @OneToOne(() => CharacterCustom)
+  characterCustom: CharacterCustom;
 
   @JoinColumn()
   @OneToOne(() => Bank)
