@@ -8,7 +8,7 @@ import 'reflect-metadata';
 // Load ENV variables
 dotenv.config();
 
-const main = async () => {
+export const main = async () => {
   if (
     !process.env.DB_HOST ||
     !process.env.DB_PORT ||
@@ -40,6 +40,7 @@ const main = async () => {
     entities: ['src/entities/**/*.ts'],
     migrations: ['src/migrations/**/*.ts'],
     subscribers: ['src/subscribers/**/*.ts'],
+    dropSchema: process.env.NODE_ENV === 'test',
   });
 
   const app = express();
