@@ -2,14 +2,45 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { routes } from './routes';
-import 'reflect-metadata';
 import { createConnection } from 'typeorm';
+import 'reflect-metadata';
 
 // Load ENV variables
 dotenv.config();
 
 const main = async () => {
-  const connection = await createConnection();
+  if (
+    !process.env.DB_HOST ||
+    !process.env.DB_PORT ||
+    !process.env.DB_USERNAME ||
+    !process.env.DB_PASSWORD
+  )
+    throw new Error('At least one DB variable is missing from your .env file');
+
+  const getEnviroment = () => {
+    switch (process.env.NODE_ENV) {
+      default:
+        return 'paradise_development';
+      case 'production':
+        return 'paradise_production';
+      case 'test':
+        return 'paradise_test';
+    }
+  };
+
+  await createConnection({
+    type: 'postgres',
+    host: process.env.DB_HOST,
+    port: parseInt(process.env.DB_PORT),
+    username: process.env.DB_USERNAME,
+    password: process.env.DB_PASSWORD,
+    database: getEnviroment(),
+    synchronize: true,
+    logging: false,
+    entities: ['src/entities/**/*.ts'],
+    migrations: ['src/migrations/**/*.ts'],
+    subscribers: ['src/subscribers/**/*.ts'],
+  });
 
   const app = express();
 

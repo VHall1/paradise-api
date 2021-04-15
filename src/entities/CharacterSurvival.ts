@@ -1,4 +1,12 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  BaseEntity,
+  Column,
+  Entity,
+  JoinColumn,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Character } from './Character';
 
 @Entity()
 export class CharacterSurvival extends BaseEntity {
@@ -13,4 +21,8 @@ export class CharacterSurvival extends BaseEntity {
 
   @Column({ default: 0 })
   armour: number;
+
+  @JoinColumn()
+  @OneToOne(() => Character)
+  character: Character;
 }
