@@ -11,12 +11,13 @@ routes.get('/user/read', userController.read);
 routes.post('/user/update', userController.update);
 
 // Character
+routes.get('/character/list/:steam', characterController.listCharacters);
+
 routes.post('/character/create', characterController.create);
-routes.get('/character/list', characterController.list);
 routes.post('/character/delete', characterController.delete);
 
 // Character Survival
-routes.post('/character/save_coords', characterController.updateCoords);
+// routes.post('/character/save_coords', characterController.updateCoords);
 
 // Bank
 routes.get('/bank/get_wallet/:id', bankController.getWallet);

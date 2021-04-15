@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { User } from '../entities/User';
+import { Bank } from '../entities/Bank';
 import { Character } from '../entities/Character';
 import { CharacterSurvival } from '../entities/CharacterSurvival';
 import { CharacterCustom } from '../entities/CharacterCustom';
@@ -23,28 +24,15 @@ export default {
         surename,
         birthdate,
       });
-    } catch (error) {
-      return res.status(400).json({ error });
-    }
 
-    let user;
-    try {
-      user = await User.findOneOrFail({ steam });
-    } catch (error) {
-      if (error.name === 'EntityNotFound')
-        return res.status(404).json({ error });
+      const user = await User.findOneOrFail({ steam });
 
-      return res.status(400).json({ error });
-    }
+      let phone;
+      do {
+        phone = (Math.floor(Math.random() * 9000000) + 1000000).toString();
+      } while (!Character.find({ phone }));
 
-    let phone;
-    do {
-      phone = (Math.floor(Math.random() * 9000000) + 1000000).toString();
-    } while (!Character.find({ phone }));
-
-    let character: Character;
-    try {
-      character = new Character();
+      const character = new Character();
 
       character.user = user;
       character.name = name;
@@ -52,16 +40,31 @@ export default {
       character.birthdate = birthdate;
       character.phone = phone;
 
+      const bank = new Bank();
+      bank.character = character;
+      await bank.save();
+
+      const survival = new CharacterSurvival();
+      survival.character = character;
+      await survival.save();
+
+      const custom = new CharacterCustom();
+      custom.character = character;
+      await custom.save();
+
       await character.save();
+
+      return res.status(200).json({ character });
     } catch (error) {
+      if (error.name === 'EntityNotFound')
+        return res.status(404).json({ error });
+
       return res.status(400).json({ error });
     }
-
-    return res.status(200).json({ character });
   },
 
-  async list(req: Request, res: Response) {
-    const { steam } = req.body;
+  async listCharacters(req: Request, res: Response) {
+    const { steam } = req.params;
 
     const schema = yup.object().shape({
       steam: yup.string().required(),
@@ -69,25 +72,23 @@ export default {
 
     try {
       await schema.validate({ steam });
-    } catch (error) {
-      return res.status(400).json({ error });
-    }
 
-    let user;
-    try {
-      user = await User.findOneOrFail({ steam }, { relations: ['characters'] });
+      const user = await User.findOneOrFail(
+        { steam },
+        { relations: ['characters'] }
+      );
+
+      const characters = user.characters.filter(
+        (character) => !character.deleted
+      );
+
+      return res.status(200).json({ characters });
     } catch (error) {
       if (error.name === 'EntityNotFound')
         return res.status(404).json({ error });
 
       return res.status(400).json({ error });
     }
-
-    const characters = user.characters.filter(
-      (character) => !character.deleted
-    );
-
-    return res.status(200).json({ characters });
   },
 
   async delete(req: Request, res: Response) {
@@ -103,13 +104,8 @@ export default {
         steam,
         id,
       });
-    } catch (error) {
-      return res.status(400).json({ error });
-    }
 
-    let character;
-    try {
-      character = await Character.findOneOrFail(id, {
+      const character = await Character.findOneOrFail(id, {
         relations: ['user'],
       });
 
@@ -123,42 +119,42 @@ export default {
       character.deleted = true;
 
       await character.save();
+
+      return res.status(200).json({ character });
     } catch (error) {
       if (error.name === 'EntityNotFound')
         return res.status(404).json({ error });
 
       return res.status(400).json({ error });
     }
-
-    return res.status(200).json({ character });
   },
 
-  async updateCoords(req: Request, res: Response) {
-    const { id, lastCoords } = req.body;
+  // async updateCoords(req: Request, res: Response) {
+  //   const { id, lastCoords } = req.body;
 
-    console.log(id, lastCoords);
-    const schema = yup.object().shape({
-      id: yup.number().required(),
-      lastCoords: yup.array().required(),
-    });
+  //   console.log(id, lastCoords);
+  //   const schema = yup.object().shape({
+  //     id: yup.number().required(),
+  //     lastCoords: yup.array().required(),
+  //   });
 
-    await schema.validate({ id, lastCoords });
+  //   await schema.validate({ id, lastCoords });
 
-    let character = await Character.findOneOrFail(id, {
-      relations: ['characterSurvival'],
-    });
+  //   let character = await Character.findOneOrFail(id, {
+  //     relations: ['characterSurvival'],
+  //   });
 
-    let characterSurvival: CharacterSurvival;
-    if (!character.characterSurvival) {
-      characterSurvival = new CharacterSurvival();
+  //   let characterSurvival: CharacterSurvival;
+  //   if (!character.characterSurvival) {
+  //     characterSurvival = new CharacterSurvival();
 
-      character.characterSurvival = characterSurvival;
-    } else characterSurvival = character.characterSurvival;
+  //     character.characterSurvival = characterSurvival;
+  //   } else characterSurvival = character.characterSurvival;
 
-    characterSurvival.lastCoords = lastCoords;
-    await characterSurvival.save();
-    await character.save();
+  //   characterSurvival.lastCoords = lastCoords;
+  //   await characterSurvival.save();
+  //   await character.save();
 
-    return res.status(200).send();
-  },
+  //   return res.status(200).send();
+  // },
 };
