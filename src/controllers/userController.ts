@@ -33,7 +33,7 @@ export default {
   },
 
   async read(req: Request, res: Response) {
-    const { steam } = req.body;
+    const { steam } = req.params;
 
     const schema = yup.object().shape({
       steam: yup.string().required(),
@@ -58,63 +58,81 @@ export default {
     return res.status(200).json({ user });
   },
 
-  async update(req: Request, res: Response) {
-    const { steam, discord, admin, whitelisted, banned, priority } = req.body;
+  async setWhitelisted(req: Request, res: Response) {
+    const { steam, status } = req.body;
 
     const schema = yup.object().shape({
       steam: yup.string().required(),
-      discord: yup.string(),
-      admin: yup.boolean(),
-      whitelisted: yup.boolean(),
-      banned: yup.boolean(),
-      priority: yup.number().integer().min(1).max(5),
+      status: yup.boolean().required(),
     });
 
     try {
-      await schema.validate({
-        steam,
-        discord,
-        admin,
-        whitelisted,
-        banned,
-        priority,
-      });
-    } catch (error) {
-      return res.status(400).json({ error });
-    }
+      await schema.validate({ steam, status });
 
-    let user: User;
-    try {
-      user = await User.findOneOrFail({ steam });
+      const user = await User.findOneOrFail({ steam });
+
+      user.whitelisted = status;
+
+      await user.save();
+
+      return res.status(200).json({ user });
     } catch (error) {
       if (error.name === 'EntityNotFound')
         return res.status(404).json({ error });
 
       return res.status(400).json({ error });
     }
+  },
+
+  async setBanned(req: Request, res: Response) {
+    const { steam, status } = req.body;
+
+    const schema = yup.object().shape({
+      steam: yup.string().required(),
+      status: yup.boolean().required(),
+    });
 
     try {
-      const values = Object.entries({
-        discord,
-        admin,
-        whitelisted,
-        banned,
-        priority,
-      });
+      await schema.validate({ steam, status });
 
-      values.forEach(([key, value]) => {
-        if (value === undefined) return;
+      const user = await User.findOneOrFail({ steam });
 
-        // @ts-ignore
-        user[key] = value;
-      });
+      user.banned = status;
 
       await user.save();
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ error });
-    }
 
-    return res.status(200).json({ user });
+      return res.status(200).json({ user });
+    } catch (error) {
+      if (error.name === 'EntityNotFound')
+        return res.status(404).json({ error });
+
+      return res.status(400).json({ error });
+    }
+  },
+
+  async setPriority(req: Request, res: Response) {
+    const { steam, priority } = req.body;
+
+    const schema = yup.object().shape({
+      steam: yup.string().required(),
+      priority: yup.number().min(1).max(5).required(),
+    });
+
+    try {
+      await schema.validate({ steam, priority });
+
+      const user = await User.findOneOrFail({ steam });
+
+      user.priority = priority;
+
+      await user.save();
+
+      return res.status(200).json({ user });
+    } catch (error) {
+      if (error.name === 'EntityNotFound')
+        return res.status(404).json({ error });
+
+      return res.status(400).json({ error });
+    }
   },
 };

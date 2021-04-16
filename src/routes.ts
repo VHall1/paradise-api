@@ -6,9 +6,12 @@ import userController from './controllers/userController';
 const routes = Router();
 
 // User
+routes.get('/user/:steam', userController.read);
 routes.post('/user/create', userController.create);
-routes.get('/user/read', userController.read);
-routes.post('/user/update', userController.update);
+
+routes.post('/user/set_whitelisted', userController.setWhitelisted);
+routes.post('/user/set_banned', userController.setBanned);
+routes.post('/user/set_priority', userController.setPriority);
 
 // Character
 routes.get('/character/list/:steam', characterController.listCharacters);
