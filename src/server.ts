@@ -8,7 +8,7 @@ import 'reflect-metadata';
 // Load ENV variables
 dotenv.config();
 
-const main = async () => {
+export const main = async () => {
   if (
     !process.env.DB_HOST ||
     !process.env.DB_PORT ||
@@ -35,7 +35,7 @@ const main = async () => {
     username: process.env.DB_USERNAME,
     password: process.env.DB_PASSWORD,
     database: getEnviroment(),
-    synchronize: true,
+    synchronize: process.env.NODE_ENV !== 'production',
     logging: false,
     entities: ['src/entities/**/*.ts'],
     migrations: ['src/migrations/**/*.ts'],
@@ -52,8 +52,9 @@ const main = async () => {
   if (!process.env.PORT) throw new Error('No PORT set in .env');
 
   app.listen(process.env.PORT, () => {
-    console.log(`🚀 Server started on port ${process.env.PORT}`);
+    if (process.env.NODE_ENV !== 'test')
+      console.log(`🚀 Server started on port ${process.env.PORT}`);
   });
 };
 
-main().catch((err) => console.error(err));
+if (process.env.NODE_ENV !== 'test') main().catch((err) => console.error(err));
