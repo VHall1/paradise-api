@@ -4,8 +4,8 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start": "nodemon src/server.ts && set NODE_ENV=development",
-    "test": "mocha -r ts-node/register src/test/**/*.test.ts && set NODE_ENV=test",
+    "start": "set NODE_ENV=development && nodemon src/server.ts",
+    "test": "set NODE_ENV=test && nodemon src/server.ts --exec \"mocha -r ts-node/register src/test/**/*.test.ts\"",
     "build": "tsc --project ./"
   },
   "dependencies": {

@@ -8,7 +8,7 @@ import 'reflect-metadata';
 // Load ENV variables
 dotenv.config();
 
-export const main = async () => {
+const main = async () => {
   if (
     !process.env.DB_HOST ||
     !process.env.DB_PORT ||
