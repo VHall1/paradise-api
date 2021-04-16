@@ -21,13 +21,14 @@ jobs:
         image: postgres
         # Provide the password for postgres
         env:
+          POSTGRES_DATABASE: paradise_test
           POSTGRES_PASSWORD: postgres
         # Set health checks to wait until postgres has started
         options: >-
           --health-cmd pg_isready
-          --health-interval 10s
+          --health-interval 5s
           --health-timeout 5s
-          --health-retries 5
+          --health-retries 1
         ports:
           # Maps tcp port 5432 on service container to the host
           - 5432:5432
@@ -42,7 +43,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Connect to PostgreSQL
+      - name: Run Tests
         # Runs a script that creates a PostgreSQL client, populates
         # the client with data, and retrieves data
         run: npm test
@@ -55,3 +56,4 @@ jobs:
           DB_USERNAME: postgres
           DB_PASSWORD: postgres
           PORT: 8080
+          NODE_ENV: test
