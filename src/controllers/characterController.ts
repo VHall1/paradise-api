@@ -40,6 +40,8 @@ export default {
       character.birthdate = birthdate;
       character.phone = phone;
 
+      await character.save();
+
       const bank = new Bank();
       bank.character = character;
       await bank.save();
@@ -51,8 +53,6 @@ export default {
       const custom = new CharacterCustom();
       custom.character = character;
       await custom.save();
-
-      await character.save();
 
       return res.status(200).json({ character });
     } catch (error) {
