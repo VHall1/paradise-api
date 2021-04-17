@@ -19,6 +19,15 @@ routes.get('/character/list/:steam', characterController.listCharacters);
 routes.post('/character/create', characterController.create);
 routes.post('/character/delete', characterController.delete);
 
+// Character Custom
+routes.get('/character/custom/:id', characterController.getCustom);
+
+routes.post(
+  '/character/custom/update_custom',
+  characterController.updateCustom
+);
+routes.post('/character/custom/update_model', characterController.updateModel);
+
 // Character Survival
 // routes.post('/character/save_coords', characterController.updateCoords);
 

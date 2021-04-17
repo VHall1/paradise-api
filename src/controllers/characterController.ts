@@ -157,4 +157,88 @@ export default {
 
   //   return res.status(200).send();
   // },
+
+  async getCustom(req: Request, res: Response) {
+    const { id } = req.params;
+
+    const schema = yup.object().shape({
+      id: yup.number().required(),
+    });
+
+    try {
+      await schema.validate({ id });
+
+      const character = await Character.findOneOrFail(id);
+      const { custom, model } = await CharacterCustom.findOneOrFail({
+        character,
+      });
+
+      return res.status(200).json({ custom, model });
+    } catch (error) {
+      if (error.name === 'EntityNotFound')
+        return res.status(404).json({ error });
+
+      return res.status(400).json({ error });
+    }
+  },
+
+  async updateCustom(req: Request, res: Response) {
+    const { id, custom } = req.body;
+    const customJSON = JSON.parse(custom);
+
+    const schema = yup.object().shape({
+      id: yup.number().required(),
+      customJSON: yup.object().required(),
+    });
+
+    try {
+      await schema.validate({ id, customJSON });
+
+      const character = await Character.findOneOrFail(id);
+      const characterCustom = await CharacterCustom.findOneOrFail({
+        character,
+      });
+
+      characterCustom.custom = customJSON;
+
+      await characterCustom.save();
+
+      return res.status(200).json({ custom: characterCustom.custom });
+    } catch (error) {
+      if (error.name === 'EntityNotFound')
+        return res.status(404).json({ error });
+
+      return res.status(400).json({ error });
+    }
+  },
+
+  async updateModel(req: Request, res: Response) {
+    const { id, model } = req.body;
+
+    const schema = yup.object().shape({
+      id: yup.number().required(),
+      model: yup.string().required(),
+    });
+
+    try {
+      await schema.validate({ id, model });
+
+      const character = await Character.findOneOrFail(id);
+      const characterCustom = await CharacterCustom.findOneOrFail({
+        character,
+      });
+
+      characterCustom.model = model;
+
+      await characterCustom.save();
+
+      return res.status(200).json({ model: characterCustom.model });
+    } catch (error) {
+      console.error(error);
+      if (error.name === 'EntityNotFound')
+        return res.status(404).json({ error });
+
+      return res.status(400).json({ error });
+    }
+  },
 };
