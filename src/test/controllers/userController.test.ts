@@ -1,5 +1,4 @@
 import { expect } from 'chai';
-import { main } from '../../server';
 import { User } from '../../entities/User';
 import request from 'supertest';
 
@@ -7,8 +6,9 @@ describe('userController', () => {
   const steam = 'steam:1100001052df7c1';
   const discord = '208343668866678786';
 
-  before(async () => {
-    await main();
+  after(async () => {
+    const user = await User.findOneOrFail({ steam });
+    await user.remove();
   });
 
   it('should be able to create a user', async () => {
