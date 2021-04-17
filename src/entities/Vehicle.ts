@@ -36,6 +36,8 @@ export class Vehicle extends BaseEntity {
   @Column('simple-array')
   doors: boolean[];
 
-  @ManyToOne(() => Character, (character) => character.vehicles)
+  @ManyToOne(() => Character, (character) => character.vehicles, {
+    onDelete: 'CASCADE',
+  })
   owner: Character;
 }
