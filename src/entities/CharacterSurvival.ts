@@ -13,7 +13,7 @@ export class CharacterSurvival extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column('simple-array')
+  @Column('simple-array', { nullable: true })
   lastCoords: number[];
 
   @Column({ default: 200 })
@@ -23,6 +23,6 @@ export class CharacterSurvival extends BaseEntity {
   armour: number;
 
   @JoinColumn()
-  @OneToOne(() => Character)
+  @OneToOne(() => Character, { onDelete: 'CASCADE' })
   character: Character;
 }

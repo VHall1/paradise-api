@@ -27,6 +27,6 @@ export class Character extends BaseEntity {
   @Column({ default: false })
   deleted: boolean;
 
-  @ManyToOne(() => User, (user) => user.characters)
+  @ManyToOne(() => User, (user) => user.characters, { onDelete: 'CASCADE' })
   user: User;
 }

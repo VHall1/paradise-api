@@ -16,11 +16,11 @@ export class CharacterCustom extends BaseEntity {
   @Column({ default: 'mp_m_freemode_01' })
   model: string;
 
-  @Column({ type: 'jsonb' })
+  @Column({ type: 'jsonb', nullable: true })
   custom: JSON;
 
   @JoinColumn()
-  @OneToOne(() => Character)
+  @OneToOne(() => Character, { onDelete: 'CASCADE' })
   character: Character;
 }
 

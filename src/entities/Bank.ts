@@ -20,6 +20,6 @@ export class Bank extends BaseEntity {
   bank: number;
 
   @JoinColumn()
-  @OneToOne(() => Character)
+  @OneToOne(() => Character, { onDelete: 'CASCADE' })
   character: Character;
 }
