@@ -4,8 +4,6 @@ name: Run tests
 on:
   push:
     branches: '*'
-  pull_request:
-    branches: '*'
 
 jobs:
   # Label of the runner job
