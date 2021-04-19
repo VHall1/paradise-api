@@ -169,11 +169,11 @@ export default {
       await schema.validate({ id });
 
       const character = await Character.findOneOrFail(id);
-      const { custom, model } = await CharacterCustom.findOneOrFail({
+      const { custom, model, clothes } = await CharacterCustom.findOneOrFail({
         character,
       });
 
-      return res.status(200).json({ custom, model });
+      return res.status(200).json({ custom, model, clothes });
     } catch (error) {
       if (error.name === 'EntityNotFound')
         return res.status(404).json({ error });
@@ -235,6 +235,36 @@ export default {
       return res.status(200).json({ model: characterCustom.model });
     } catch (error) {
       console.error(error);
+      if (error.name === 'EntityNotFound')
+        return res.status(404).json({ error });
+
+      return res.status(400).json({ error });
+    }
+  },
+
+  async updateClothes(req: Request, res: Response) {
+    const { id, clothes } = req.body;
+    const clothesJSON = JSON.parse(clothes);
+
+    const schema = yup.object().shape({
+      id: yup.number().required(),
+      clothesJSON: yup.object().required(),
+    });
+
+    try {
+      await schema.validate({ id, clothesJSON });
+
+      const character = await Character.findOneOrFail(id);
+      const characterCustom = await CharacterCustom.findOneOrFail({
+        character,
+      });
+
+      characterCustom.custom = clothesJSON;
+
+      await characterCustom.save();
+
+      return res.status(200).json({ clothes: characterCustom.clothes });
+    } catch (error) {
       if (error.name === 'EntityNotFound')
         return res.status(404).json({ error });
 
