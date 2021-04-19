@@ -26,6 +26,10 @@ routes.post(
   '/character/custom/update_custom',
   characterController.updateCustom
 );
+routes.post(
+  '/character/custom/update_clothes',
+  characterController.updateClothes
+);
 routes.post('/character/custom/update_model', characterController.updateModel);
 
 // Character Survival
