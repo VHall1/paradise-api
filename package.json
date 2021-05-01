@@ -5,15 +5,18 @@
   "license": "MIT",
   "scripts": {
     "start": "cross-env NODE_ENV=development nodemon src/server.ts",
-    "test": "cross-env NODE_ENV=test mocha -r ts-node/register --recursive \"src/test/**/*.test.ts\" --exit",
     "build": "tsc --project ./"
   },
   "dependencies": {
+    "apollo-server-express": "^2.24.0",
+    "class-validator": "^0.13.1",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "graphql": "^15.5.0",
     "pg": "^8.5.1",
     "reflect-metadata": "^0.1.13",
+    "type-graphql": "^1.1.1",
     "typeorm": "^0.2.31",
     "yup": "^0.32.9"
   },

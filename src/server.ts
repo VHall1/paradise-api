@@ -1,60 +1,56 @@
-import express from 'express';
+import { ApolloServer } from 'apollo-server-express';
 import cors from 'cors';
-import dotenv from 'dotenv';
-import { routes } from './routes';
-import { createConnection } from 'typeorm';
+import express from 'express';
+import path from 'path';
 import 'reflect-metadata';
+import { createConnection } from 'typeorm';
+import { __PROD__ } from './constants';
+import { buildSchema } from 'type-graphql';
+import { User } from './entities/User';
+import { HelloResolver } from './resolvers/hello';
+import { Character } from './entities/Character';
+import { UserResolver } from './resolvers/user';
 
-// Load ENV variables
-dotenv.config();
-
-export const main = async () => {
-  if (
-    !process.env.DB_HOST ||
-    !process.env.DB_PORT ||
-    !process.env.DB_USERNAME ||
-    !process.env.DB_PASSWORD
-  )
-    throw new Error('At least one DB variable is missing from your .env file');
-
-  const getEnviroment = () => {
-    switch (process.env.NODE_ENV) {
-      default:
-        return 'paradise_development';
-      case 'production':
-        return 'paradise_production';
-      case 'test':
-        return 'paradise_test';
-    }
-  };
-
+const main = async () => {
   await createConnection({
     type: 'postgres',
-    host: process.env.DB_HOST,
-    port: parseInt(process.env.DB_PORT),
-    username: process.env.DB_USERNAME,
-    password: process.env.DB_PASSWORD,
-    database: getEnviroment(),
-    synchronize: process.env.NODE_ENV !== 'production',
-    logging: false,
-    entities: ['src/entities/**/*.ts'],
-    migrations: ['src/migrations/**/*.ts'],
-    subscribers: ['src/subscribers/**/*.ts'],
+    database: 'paradise',
+    synchronize: !__PROD__,
+    logging: !__PROD__,
+    entities: [User, Character],
+    migrations: [path.join(__dirname, './migrations/*')],
     dropSchema: process.env.NODE_ENV === 'test',
   });
 
   const app = express();
 
-  app.use(cors());
-  app.use(express.json());
-  app.use(routes);
+  app.use(
+    cors({
+      origin: 'http://localhost:30120',
+      credentials: false,
+    })
+  );
 
-  if (!process.env.PORT) throw new Error('No PORT set in .env');
+  const apolloServer = new ApolloServer({
+    schema: await buildSchema({
+      resolvers: [HelloResolver, UserResolver],
+      validate: false,
+    }),
+    context: ({ req, res }) => ({
+      req,
+      res,
+    }),
+  });
 
-  app.listen(process.env.PORT, () => {
+  apolloServer.applyMiddleware({
+    app,
+    cors: false,
+  });
+
+  app.listen(4000, () => {
     if (process.env.NODE_ENV !== 'test')
-      console.log(`🚀 Server started on port ${process.env.PORT}`);
+      console.log(`🚀 Server started on port 4000`);
   });
 };
 
-if (process.env.NODE_ENV !== 'test') main().catch((err) => console.error(err));
+main().catch((err) => console.error(err));

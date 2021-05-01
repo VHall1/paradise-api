@@ -1,36 +1,43 @@
+import { Field, Int, ObjectType } from 'type-graphql';
 import {
   BaseEntity,
   Column,
   Entity,
   ManyToOne,
-  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from './User';
-import { Vehicle } from './Vehicle';
 
+@ObjectType()
 @Entity()
 export class Character extends BaseEntity {
+  @Field()
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number;
 
+  @Field()
   @Column()
-  name: string;
+  name!: string;
 
+  @Field()
   @Column()
-  surename: string;
+  surename!: string;
 
+  @Field()
   @Column()
-  birthdate: string;
+  birthdate!: string;
 
+  @Field()
   @Column({ unique: true })
-  phone: string;
+  phone!: string;
 
+  @Field()
   @Column({ default: false })
-  deleted: boolean;
+  deleted!: boolean;
 
-  @OneToMany(() => Vehicle, (vehicle) => vehicle.owner)
-  vehicles: Vehicle[];
+  @Field(() => Int)
+  @Column()
+  userId: number;
 
   @ManyToOne(() => User, (user) => user.characters, { onDelete: 'CASCADE' })
   user: User;
