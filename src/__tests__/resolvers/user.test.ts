@@ -4,8 +4,8 @@ import { print } from 'graphql';
 import request from 'supertest';
 
 describe('User Resolver', () => {
-  const steam = '20834366886667876';
-  const discord = 'steam:1100002052df7c1';
+  const steam = 'steam:1100002052df7c1';
+  const discord = '20834366886667876';
 
   it('should be able to create a user', async () => {
     const mutation = gql`
