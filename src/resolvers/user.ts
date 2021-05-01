@@ -76,7 +76,8 @@ export class UserResolver {
       };
     }
 
-    await User.update({ steam }, { whitelisted });
+    user.whitelisted = whitelisted;
+    await user.save();
 
     return { user };
   }
@@ -99,7 +100,8 @@ export class UserResolver {
       };
     }
 
-    await User.update({ steam }, { banned });
+    user.banned = banned;
+    await user.save();
 
     return { user };
   }
@@ -122,7 +124,8 @@ export class UserResolver {
       };
     }
 
-    await User.update({ steam }, { admin });
+    user.admin = admin;
+    await user.save();
 
     return { user };
   }
@@ -145,7 +148,8 @@ export class UserResolver {
       };
     }
 
-    await User.update({ steam }, { priority });
+    user.priority = priority;
+    await user.save();
 
     return { user };
   }
