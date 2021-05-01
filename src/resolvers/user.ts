@@ -5,6 +5,7 @@ import {
   Arg,
   ObjectType,
   Field,
+  Int,
 } from 'type-graphql';
 import { User } from '../entities/User';
 
@@ -129,7 +130,7 @@ export class UserResolver {
   @Mutation(() => UserResponse)
   async setPriority(
     @Arg('steam') steam: string,
-    @Arg('priority') priority: number
+    @Arg('priority', () => Int) priority: number
   ): Promise<UserResponse> {
     const user = await User.findOne({ steam });
 

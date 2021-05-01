@@ -1,4 +1,4 @@
-import { Field, ObjectType } from 'type-graphql';
+import { Field, Int, ObjectType } from 'type-graphql';
 import {
   BaseEntity,
   Column,
@@ -11,7 +11,7 @@ import { Character } from './Character';
 @ObjectType()
 @Entity()
 export class User extends BaseEntity {
-  @Field()
+  @Field(() => Int)
   @PrimaryGeneratedColumn()
   id!: number;
 
@@ -35,7 +35,7 @@ export class User extends BaseEntity {
   @Column({ default: false })
   banned!: boolean;
 
-  @Field()
+  @Field(() => Int)
   @Column({ default: 1 })
   priority!: number;
 
