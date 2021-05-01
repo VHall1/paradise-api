@@ -4,23 +4,23 @@ import express from 'express';
 import path from 'path';
 import 'reflect-metadata';
 import { createConnection } from 'typeorm';
-import { __PROD__ } from './constants';
+import { __DEV__, __PROD__, __TEST__ } from './constants';
 import { buildSchema } from 'type-graphql';
 import { User } from './entities/User';
-import { HelloResolver } from './resolvers/hello';
 import { Character } from './entities/Character';
 import { UserResolver } from './resolvers/user';
 
-const main = async () => {
-  await createConnection({
+export const main = async () => {
+  const conn = await createConnection({
     type: 'postgres',
-    database: 'paradise',
+    database: !__TEST__ ? 'paradise' : 'paradise_test',
     synchronize: !__PROD__,
-    logging: !__PROD__,
+    logging: __DEV__,
+    dropSchema: __TEST__,
     entities: [User, Character],
     migrations: [path.join(__dirname, './migrations/*')],
-    dropSchema: process.env.NODE_ENV === 'test',
   });
+  await conn.runMigrations();
 
   const app = express();
 
@@ -33,7 +33,7 @@ const main = async () => {
 
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
-      resolvers: [HelloResolver, UserResolver],
+      resolvers: [UserResolver],
       validate: false,
     }),
     context: ({ req, res }) => ({
@@ -48,9 +48,6 @@ const main = async () => {
   });
 
   app.listen(4000, () => {
-    if (process.env.NODE_ENV !== 'test')
-      console.log(`🚀 Server started on port 4000`);
+    console.log(`🚀 Server started on port 4000`);
   });
 };
-
-main().catch((err) => console.error(err));
