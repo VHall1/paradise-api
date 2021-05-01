@@ -1,3 +1,4 @@
+import { Field, Int, ObjectType } from 'type-graphql';
 import {
   BaseEntity,
   Column,
@@ -7,36 +8,36 @@ import {
 } from 'typeorm';
 import { Character } from './Character';
 
-enum UserLocales {
-  ENGLISH = 'en',
-  PORTUGUESE = 'pt',
-}
-
+@ObjectType()
 @Entity()
 export class User extends BaseEntity {
+  @Field(() => Int)
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number;
 
+  @Field()
   @Column({ unique: true })
-  steam: string;
+  steam!: string;
 
+  @Field()
   @Column({ unique: true })
-  discord: string;
+  discord!: string;
 
+  @Field()
   @Column({ default: false })
-  admin: boolean;
+  admin!: boolean;
 
+  @Field()
   @Column({ default: false })
-  whitelisted: boolean;
+  whitelisted!: boolean;
 
+  @Field()
   @Column({ default: false })
-  banned: boolean;
+  banned!: boolean;
 
+  @Field(() => Int)
   @Column({ default: 1 })
-  priority: number;
-
-  @Column({ type: 'enum', enum: UserLocales, default: UserLocales.PORTUGUESE })
-  locale: UserLocales;
+  priority!: number;
 
   @OneToMany(() => Character, (character) => character.user)
   characters: Character[];
