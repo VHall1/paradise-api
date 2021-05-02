@@ -15,7 +15,6 @@ describe('User Resolver', () => {
           steam: "${steam}"
         ) {
           user {
-            id
             steam
             discord
           }
@@ -29,7 +28,6 @@ describe('User Resolver', () => {
         query: print(mutation),
       });
 
-    expect(response.body?.data.createUser.user?.id).to.eq(1);
     expect(response.body?.data.createUser.user?.steam).to.eq(steam);
     expect(response.body?.data.createUser.user?.discord).to.eq(discord);
     expect(response.status).to.eq(200);
@@ -41,7 +39,6 @@ describe('User Resolver', () => {
         getUser(
           steam: "${steam}"
         ) {
-          id
           steam
           discord
         }
@@ -54,7 +51,6 @@ describe('User Resolver', () => {
         query: print(query),
       });
 
-    expect(response.body?.data.getUser.id).to.eq(1);
     expect(response.body?.data.getUser.steam).to.eq(steam);
     expect(response.body?.data.getUser.discord).to.eq(discord);
     expect(response.status).to.eq(200);
