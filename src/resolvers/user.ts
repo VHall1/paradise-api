@@ -1,22 +1,14 @@
 import {
-  Resolver,
-  Query,
-  Mutation,
   Arg,
-  ObjectType,
   Field,
   Int,
+  Mutation,
+  ObjectType,
+  Query,
+  Resolver,
 } from 'type-graphql';
 import { User } from '../entities/User';
-
-@ObjectType()
-class FieldError {
-  @Field()
-  field: string;
-
-  @Field()
-  message: string;
-}
+import { FieldError } from '../types';
 
 @ObjectType()
 class UserResponse {
@@ -31,7 +23,7 @@ class UserResponse {
 export class UserResolver {
   @Query(() => User, { nullable: true })
   async getUser(@Arg('steam') steam: string): Promise<User | undefined> {
-    return User.findOne({ steam });
+    return User.findOne(steam);
   }
 
   @Mutation(() => UserResponse)
@@ -63,7 +55,7 @@ export class UserResolver {
     @Arg('steam') steam: string,
     @Arg('whitelisted') whitelisted: boolean
   ): Promise<UserResponse> {
-    const user = await User.findOne({ steam });
+    const user = await User.findOne(steam);
 
     if (!user) {
       return {
@@ -87,7 +79,7 @@ export class UserResolver {
     @Arg('steam') steam: string,
     @Arg('banned') banned: boolean
   ): Promise<UserResponse> {
-    const user = await User.findOne({ steam });
+    const user = await User.findOne(steam);
 
     if (!user) {
       return {
@@ -111,7 +103,7 @@ export class UserResolver {
     @Arg('steam') steam: string,
     @Arg('admin') admin: boolean
   ): Promise<UserResponse> {
-    const user = await User.findOne({ steam });
+    const user = await User.findOne(steam);
 
     if (!user) {
       return {
@@ -135,7 +127,7 @@ export class UserResolver {
     @Arg('steam') steam: string,
     @Arg('priority', () => Int) priority: number
   ): Promise<UserResponse> {
-    const user = await User.findOne({ steam });
+    const user = await User.findOne(steam);
 
     if (!user) {
       return {

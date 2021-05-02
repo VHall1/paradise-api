@@ -1,22 +1,12 @@
 import { Field, Int, ObjectType } from 'type-graphql';
-import {
-  BaseEntity,
-  Column,
-  Entity,
-  OneToMany,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { BaseEntity, Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
 import { Character } from './Character';
 
 @ObjectType()
 @Entity()
 export class User extends BaseEntity {
-  @Field(() => Int)
-  @PrimaryGeneratedColumn()
-  id!: number;
-
   @Field()
-  @Column({ unique: true })
+  @PrimaryColumn()
   steam!: string;
 
   @Field()
