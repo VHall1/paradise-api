@@ -10,10 +10,12 @@ import { __DEV__, __PROD__, __TEST__ } from './constants';
 import { Bank } from './entities/Bank';
 import { Character } from './entities/Character';
 import { Custom } from './entities/Custom';
+import { Survival } from './entities/Survival';
 import { User } from './entities/User';
 import { BankResolver } from './resolvers/bank';
 import { CharacterResolver } from './resolvers/character';
 import { CustomResolver } from './resolvers/custom';
+import { SurvivalResolver } from './resolvers/survival';
 import { UserResolver } from './resolvers/user';
 
 dotenv.config();
@@ -37,7 +39,7 @@ export const main = async () => {
     synchronize: !__PROD__,
     logging: __DEV__,
     dropSchema: __TEST__,
-    entities: [User, Character, Bank, Custom],
+    entities: [User, Character, Bank, Custom, Survival],
     migrations: [path.join(__dirname, './migrations/*')],
   });
   await conn.runMigrations();
@@ -58,6 +60,7 @@ export const main = async () => {
         CharacterResolver,
         BankResolver,
         CustomResolver,
+        SurvivalResolver,
       ],
       validate: false,
     }),
