@@ -3,7 +3,7 @@ import { MiddlewareFn } from 'type-graphql';
 import { MyContext } from '../types';
 
 export const isBank: MiddlewareFn<MyContext> = async ({ args }, next) => {
-  const bank = await Bank.findOne({ characterId: args?.id });
+  const bank = await Bank.findOne(args?.id);
 
   if (!bank) {
     await Bank.create({ characterId: args?.id }).save();
@@ -16,8 +16,8 @@ export const isBankTransfer: MiddlewareFn<MyContext> = async (
   { args },
   next
 ) => {
-  const bank = await Bank.findOne({ characterId: args?.options.id });
-  const bankTarget = await Bank.findOne({ characterId: args?.target });
+  const bank = await Bank.findOne(args?.options.id);
+  const bankTarget = await Bank.findOne(args?.target);
 
   if (!bank) {
     await Bank.create({ characterId: args?.options.id }).save();
