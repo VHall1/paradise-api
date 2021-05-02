@@ -1,15 +1,18 @@
 import { ApolloServer } from 'apollo-server-express';
 import cors from 'cors';
+import dotenv from 'dotenv';
 import express from 'express';
 import path from 'path';
 import 'reflect-metadata';
+import { buildSchema } from 'type-graphql';
 import { createConnection } from 'typeorm';
 import { __DEV__, __PROD__, __TEST__ } from './constants';
-import { buildSchema } from 'type-graphql';
-import { User } from './entities/User';
+import { Bank } from './entities/Bank';
 import { Character } from './entities/Character';
+import { User } from './entities/User';
+import { BankResolver } from './resolvers/bank';
+import { CharacterResolver } from './resolvers/character';
 import { UserResolver } from './resolvers/user';
-import dotenv from 'dotenv';
 
 dotenv.config();
 
@@ -32,7 +35,7 @@ export const main = async () => {
     synchronize: !__PROD__,
     logging: __DEV__,
     dropSchema: __TEST__,
-    entities: [User, Character],
+    entities: [User, Character, Bank],
     migrations: [path.join(__dirname, './migrations/*')],
   });
   await conn.runMigrations();
@@ -48,7 +51,7 @@ export const main = async () => {
 
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
-      resolvers: [UserResolver],
+      resolvers: [UserResolver, CharacterResolver, BankResolver],
       validate: false,
     }),
     context: ({ req, res }) => ({
