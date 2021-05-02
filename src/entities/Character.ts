@@ -3,6 +3,7 @@ import {
   BaseEntity,
   Column,
   Entity,
+  Index,
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -11,7 +12,7 @@ import { User } from './User';
 @ObjectType()
 @Entity()
 export class Character extends BaseEntity {
-  @Field()
+  @Field(() => Int)
   @PrimaryGeneratedColumn()
   id!: number;
 
@@ -35,9 +36,10 @@ export class Character extends BaseEntity {
   @Column({ default: false })
   deleted!: boolean;
 
-  @Field(() => Int)
+  @Field()
+  @Index()
   @Column()
-  userId: number;
+  userSteam: string;
 
   @ManyToOne(() => User, (user) => user.characters, { onDelete: 'CASCADE' })
   user: User;
