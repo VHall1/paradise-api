@@ -8,7 +8,9 @@ import {
   ObjectType,
   Query,
   Resolver,
+  UseMiddleware,
 } from 'type-graphql';
+import { isBank, isBankTransfer } from '../middleware/isBank';
 
 @InputType()
 class SelfTransfer {
@@ -31,11 +33,13 @@ class BankResponse {
 @Resolver()
 export class BankResolver {
   @Query(() => Bank, { nullable: true })
-  bank(@Arg('id') id: number): Promise<Bank | undefined> {
+  @UseMiddleware(isBank)
+  bank(@Arg('id', () => Int) id: number): Promise<Bank | undefined> {
     return Bank.findOne({ characterId: id });
   }
 
   @Mutation(() => BankResponse)
+  @UseMiddleware(isBank)
   async deposit(
     @Arg('options') { id, value }: SelfTransfer
   ): Promise<BankResponse> {
@@ -58,6 +62,7 @@ export class BankResolver {
   }
 
   @Mutation(() => BankResponse)
+  @UseMiddleware(isBank)
   async withdraw(
     @Arg('options') { id, value }: SelfTransfer
   ): Promise<BankResponse> {
@@ -80,9 +85,10 @@ export class BankResolver {
   }
 
   @Mutation(() => BankResponse)
+  @UseMiddleware(isBankTransfer)
   async transferWallet(
     @Arg('options') { id, value }: SelfTransfer,
-    @Arg('target') target: number
+    @Arg('target', () => Int) target: number
   ): Promise<BankResponse> {
     const bank = await Bank.findOne({ characterId: id });
     const bankTarget = await Bank.findOne({ characterId: target });
@@ -102,9 +108,10 @@ export class BankResolver {
   }
 
   @Mutation(() => BankResponse)
+  @UseMiddleware(isBankTransfer)
   async transferBank(
     @Arg('options') { id, value }: SelfTransfer,
-    @Arg('target') target: number
+    @Arg('target', () => Int) target: number
   ): Promise<BankResponse> {
     const bank = await Bank.findOne({ characterId: id });
     const bankTarget = await Bank.findOne({ characterId: target });
@@ -121,6 +128,7 @@ export class BankResolver {
   }
 
   @Mutation(() => BankResponse)
+  @UseMiddleware(isBank)
   async payWallet(
     @Arg('options') { id, value }: SelfTransfer
   ): Promise<BankResponse> {
@@ -140,6 +148,7 @@ export class BankResolver {
   }
 
   @Mutation(() => BankResponse)
+  @UseMiddleware(isBank)
   async payBank(
     @Arg('options') { id, value }: SelfTransfer
   ): Promise<BankResponse> {
