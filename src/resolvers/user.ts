@@ -22,7 +22,7 @@ class UserResponse {
 @Resolver()
 export class UserResolver {
   @Query(() => User, { nullable: true })
-  async getUser(@Arg('steam') steam: string): Promise<User | undefined> {
+  async user(@Arg('steam') steam: string): Promise<User | undefined> {
     return User.findOne(steam);
   }
 

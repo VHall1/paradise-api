@@ -36,7 +36,7 @@ describe('User Resolver', () => {
   it('should be able to get a user', async () => {
     const query = gql`
       {
-        getUser(
+        user(
           steam: "${steam}"
         ) {
           steam
@@ -51,8 +51,8 @@ describe('User Resolver', () => {
         query: print(query),
       });
 
-    expect(response.body?.data.getUser.steam).to.eq(steam);
-    expect(response.body?.data.getUser.discord).to.eq(discord);
+    expect(response.body?.data.user.steam).to.eq(steam);
+    expect(response.body?.data.user.discord).to.eq(discord);
     expect(response.status).to.eq(200);
   });
 
