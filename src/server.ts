@@ -12,6 +12,7 @@ import { Character } from './entities/Character';
 import { Custom } from './entities/Custom';
 import { Survival } from './entities/Survival';
 import { User } from './entities/User';
+import { Vehicle } from './entities/Vehicle';
 import { BankResolver } from './resolvers/bank';
 import { CharacterResolver } from './resolvers/character';
 import { CustomResolver } from './resolvers/custom';
@@ -39,7 +40,7 @@ export const main = async () => {
     synchronize: !__PROD__,
     logging: __DEV__,
     dropSchema: __TEST__,
-    entities: [User, Character, Bank, Custom, Survival],
+    entities: [User, Character, Bank, Custom, Survival, Vehicle],
     migrations: [path.join(__dirname, './migrations/*')],
   });
   await conn.runMigrations();
