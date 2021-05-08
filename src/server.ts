@@ -31,11 +31,7 @@ export const main = async () => {
 
   const conn = await createConnection({
     type: 'postgres',
-    host: process.env.DB_HOST,
-    port: parseInt(process.env.DB_PORT),
-    username: process.env.DB_USERNAME,
-    password: process.env.DB_PASSWORD,
-    database: !__TEST__ ? process.env.DB_NAME : 'paradise_test',
+    url: process.env.DATABASE_URL,
     synchronize: !__PROD__,
     logging: __DEV__,
     dropSchema: __TEST__,
