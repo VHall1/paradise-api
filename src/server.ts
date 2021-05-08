@@ -23,6 +23,7 @@ dotenv.config();
 export const main = async () => {
   const conn = await createConnection({
     type: 'postgres',
+    ssl: __PROD__,
     url: process.env.DATABASE_URL,
     synchronize: !__PROD__,
     logging: __DEV__,
