@@ -21,14 +21,6 @@ import { UserResolver } from './resolvers/user';
 dotenv.config();
 
 export const main = async () => {
-  if (
-    !process.env.DB_HOST ||
-    !process.env.DB_PORT ||
-    !process.env.DB_USERNAME ||
-    !process.env.DB_PASSWORD
-  )
-    throw new Error('At least one DB variable is missing from your .env file');
-
   const conn = await createConnection({
     type: 'postgres',
     url: process.env.DATABASE_URL,
