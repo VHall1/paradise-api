@@ -1,5 +1,4 @@
 import { ApolloServer } from 'apollo-server-express';
-import cors from 'cors';
 import dotenv from 'dotenv';
 import express from 'express';
 import path from 'path';
@@ -36,7 +35,7 @@ export const main = async () => {
     port: parseInt(process.env.DB_PORT),
     username: process.env.DB_USERNAME,
     password: process.env.DB_PASSWORD,
-    database: !__TEST__ ? 'paradise' : 'paradise_test',
+    database: !__TEST__ ? process.env.DB_NAME : 'paradise_test',
     synchronize: !__PROD__,
     logging: __DEV__,
     dropSchema: __TEST__,
@@ -46,13 +45,6 @@ export const main = async () => {
   await conn.runMigrations();
 
   const app = express();
-
-  app.use(
-    cors({
-      origin: 'http://localhost:30120',
-      credentials: false,
-    })
-  );
 
   const apolloServer = new ApolloServer({
     schema: await buildSchema({

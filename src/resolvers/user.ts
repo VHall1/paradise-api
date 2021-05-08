@@ -1,3 +1,4 @@
+import { useProtected } from '../middleware/useProtected';
 import {
   Arg,
   Field,
@@ -6,6 +7,7 @@ import {
   ObjectType,
   Query,
   Resolver,
+  UseMiddleware,
 } from 'type-graphql';
 import { User } from '../entities/User';
 import { FieldError } from '../types';
@@ -22,11 +24,13 @@ class UserResponse {
 @Resolver()
 export class UserResolver {
   @Query(() => User, { nullable: true })
+  @UseMiddleware(useProtected)
   async user(@Arg('steam') steam: string): Promise<User | undefined> {
     return User.findOne(steam);
   }
 
   @Mutation(() => UserResponse)
+  @UseMiddleware(useProtected)
   async createUser(
     @Arg('steam') steam: string,
     @Arg('discord') discord: string
@@ -51,6 +55,7 @@ export class UserResolver {
   }
 
   @Mutation(() => UserResponse)
+  @UseMiddleware(useProtected)
   async setWhitelisted(
     @Arg('steam') steam: string,
     @Arg('whitelisted') whitelisted: boolean
@@ -75,6 +80,7 @@ export class UserResolver {
   }
 
   @Mutation(() => UserResponse)
+  @UseMiddleware(useProtected)
   async setBanned(
     @Arg('steam') steam: string,
     @Arg('banned') banned: boolean
@@ -99,6 +105,7 @@ export class UserResolver {
   }
 
   @Mutation(() => UserResponse)
+  @UseMiddleware(useProtected)
   async setAdmin(
     @Arg('steam') steam: string,
     @Arg('admin') admin: boolean
@@ -123,6 +130,7 @@ export class UserResolver {
   }
 
   @Mutation(() => UserResponse)
+  @UseMiddleware(useProtected)
   async setPriority(
     @Arg('steam') steam: string,
     @Arg('priority', () => Int) priority: number
