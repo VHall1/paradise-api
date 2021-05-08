@@ -6,7 +6,7 @@
   "scripts": {
     "watch": "tsc -w",
     "dev": "node dist/index.js",
-    "start": "tsc && node dist/index.js",
+    "start": "yarn tsc && yarn node dist/index.js",
     "test": "mocha -r ts-node/register --recursive \"src/__tests__/**/*.test.ts\" --exit"
   },
   "dependencies": {
