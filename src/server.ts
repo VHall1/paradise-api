@@ -21,10 +21,21 @@ import { UserResolver } from './resolvers/user';
 dotenv.config();
 
 export const main = async () => {
+  if (
+    !process.env.DB_HOST ||
+    !process.env.DB_PORT ||
+    !process.env.DB_USERNAME ||
+    !process.env.DB_PASSWORD
+  )
+    throw new Error('At least one DB variable is missing from your .env file');
+
   const conn = await createConnection({
     type: 'postgres',
-    ssl: __PROD__,
-    url: process.env.DATABASE_URL,
+    host: process.env.DB_HOST,
+    port: parseInt(process.env.DB_PORT),
+    username: process.env.DB_USERNAME,
+    password: process.env.DB_PASSWORD,
+    database: !__TEST__ ? process.env.DB_NAME : 'paradise_test',
     synchronize: !__PROD__,
     logging: __DEV__,
     dropSchema: __TEST__,
