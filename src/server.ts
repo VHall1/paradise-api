@@ -2,6 +2,7 @@ import { ApolloServer } from 'apollo-server-express';
 import dotenv from 'dotenv';
 import express from 'express';
 import path from 'path';
+import cors from 'cors';
 import 'reflect-metadata';
 import { buildSchema } from 'type-graphql';
 import { createConnection } from 'typeorm';
@@ -45,6 +46,8 @@ export const main = async () => {
   await conn.runMigrations();
 
   const app = express();
+
+  app.use(cors({ origin: false }));
 
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
