@@ -24,7 +24,7 @@ class SurvivalInput {
 export class SurvivalResolver {
   @Query(() => Survival, { nullable: true })
   @UseMiddleware(isSurvival)
-  survival(@Arg('id') id: number): Promise<Survival | undefined> {
+  survival(@Arg('id', () => Int) id: number): Promise<Survival | undefined> {
     return Survival.findOne(id);
   }
 
