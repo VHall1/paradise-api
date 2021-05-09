@@ -19,7 +19,7 @@ export class Custom extends BaseEntity {
 
   @Field()
   @Column({ default: 'mp_m_freemode_01' })
-  model: string;
+  model!: string;
 
   @Field(() => GraphQLJSON)
   @Column({ type: 'jsonb', nullable: true })

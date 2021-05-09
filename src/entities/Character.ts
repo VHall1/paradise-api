@@ -1,3 +1,4 @@
+import { GraphQLJSON } from 'graphql-type-json';
 import { Field, Int, ObjectType } from 'type-graphql';
 import {
   BaseEntity,
@@ -35,6 +36,10 @@ export class Character extends BaseEntity {
   @Field()
   @Column({ default: false })
   deleted!: boolean;
+
+  @Field(() => GraphQLJSON)
+  @Column('simple-array', { nullable: true })
+  permissions: string[];
 
   @Field()
   @Index()

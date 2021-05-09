@@ -18,11 +18,11 @@ export class Bank extends BaseEntity {
 
   @Field(() => Int)
   @Column({ default: 500 })
-  wallet: number;
+  wallet!: number;
 
   @Field(() => Int)
   @Column({ default: 4500 })
-  bank: number;
+  bank!: number;
 
   @Field(() => Int)
   @Column()

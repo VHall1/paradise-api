@@ -17,17 +17,17 @@ export class Survival extends BaseEntity {
   @PrimaryColumn()
   characterId: number;
 
-  @Field(() => GraphQLJSON, { nullable: true })
+  @Field(() => GraphQLJSON)
   @Column('simple-array', { nullable: true })
   lastCoords: number[];
 
   @Field(() => Int)
   @Column({ default: 200 })
-  health: number;
+  health!: number;
 
   @Field(() => Int)
   @Column({ default: 0 })
-  armour: number;
+  armour!: number;
 
   @JoinColumn()
   @OneToOne(() => Character, { onDelete: 'CASCADE' })
