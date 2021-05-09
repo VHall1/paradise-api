@@ -59,7 +59,7 @@ export class CharacterResolver {
     @Arg('id', () => Int) id: number,
     @Arg('steam') steam: string
   ): Promise<Character[]> {
-    await Character.delete({ id, userSteam: steam });
+    await Character.update({ id }, { deleted: true });
     return Character.find({ where: { userSteam: steam } });
   }
 }
