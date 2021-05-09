@@ -62,4 +62,36 @@ export class CharacterResolver {
     await Character.update({ id }, { deleted: true });
     return Character.find({ where: { userSteam: steam } });
   }
+
+  @Mutation(() => Boolean)
+  async addPermission(
+    @Arg('id', () => Int) id: number,
+    @Arg('permission') permission: string
+  ): Promise<Boolean> {
+    const character = await Character.findOne(id);
+
+    if (character?.permissions && !character.permissions.includes(permission)) {
+      character.permissions.push(permission);
+      await character.save();
+    }
+
+    return true;
+  }
+
+  @Mutation(() => Boolean)
+  async removePermission(
+    @Arg('id', () => Int) id: number,
+    @Arg('permission') permission: string
+  ): Promise<Boolean> {
+    const character = await Character.findOne(id);
+
+    if (character?.permissions && character.permissions.includes(permission)) {
+      character.permissions = character.permissions.filter(
+        (_permission) => _permission !== permission
+      );
+      await character.save();
+    }
+
+    return true;
+  }
 }
