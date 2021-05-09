@@ -38,7 +38,7 @@ export class Character extends BaseEntity {
   deleted!: boolean;
 
   @Field(() => GraphQLJSON)
-  @Column('simple-array', { nullable: true })
+  @Column('simple-array', { default: JSON.stringify([]) })
   permissions: string[];
 
   @Field()
