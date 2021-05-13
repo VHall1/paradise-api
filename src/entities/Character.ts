@@ -46,6 +46,9 @@ export class Character extends BaseEntity {
   @Column()
   userSteam: string;
 
-  @ManyToOne(() => User, (user) => user.characters, { onDelete: 'CASCADE' })
+  @ManyToOne(() => User, (user) => user.characters, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   user: User;
 }
